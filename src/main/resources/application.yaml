@@ -32,8 +32,8 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres?encoding=UTF-8
     driverClassName: org.postgresql.Driver
-    username: postgres
-    password: adminpw123
+    username: 
+    password: 
 #Ovo su podesavanja samo za JAR applikacije, WAR server podesavanja se definisu na samom serveru
 server:
   port: 8090
