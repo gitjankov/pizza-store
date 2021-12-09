@@ -5,8 +5,9 @@ Befor you start to use API first go to
 ./resource/application.yaml
 and change fields 
 
-username: #your user name of postge
-password: #postgre password for user
+username: #your user name of postges server
+
+password: #postgres password for provided user
  
 also change the port of postgre server if you don't use deafult
   
