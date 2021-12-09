@@ -1,0 +1,42 @@
+endpoints:
+spring:
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+  logging:
+    level:
+      org:
+        hibernate:
+          SQL:
+            TRACE
+          type:
+            descriptor:
+              sql:
+                BasicBinder:
+                  TRACE
+  jmx:
+    domain: pizza-store-api
+    uniqueNames: true
+    enabled=false:
+
+  application:
+
+    name: pizza-store
+    jmx:
+      default-domain: pizza-store
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres?encoding=UTF-8
+    driverClassName: org.postgresql.Driver
+    username: postgres
+    password: adminpw123
+#Ovo su podesavanja samo za JAR applikacije, WAR server podesavanja se definisu na samom serveru
+server:
+  port: 8090
+  max-http-header-size: 65536
+  contextPath: /pizza-store
+
