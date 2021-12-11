@@ -1,10 +1,9 @@
 package com.example.pizzastore.controller;
 
-import com.example.pizzastore.dto.ApiResponse;
 import com.example.pizzastore.model.Pizza;
 import com.example.pizzastore.repsitory.PizzaStoreRepository;
 import com.example.pizzastore.service.PizzaStoreService;
-import com.example.pizzastore.service.exception.ItemAlreadyExistException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.http.HttpStatus;
@@ -19,6 +18,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+@Slf4j
 @RestController
 @RequestMapping("/menu")
 public class PizzaStoreController {
@@ -29,13 +29,15 @@ public class PizzaStoreController {
     private PizzaStoreRepository pizzaStoreRepository;
     ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     Validator validator = factory.getValidator();
+    private AuthController authController;
 
     @Autowired
     public PizzaStoreController(PizzaStoreService pizzaStoreService,PizzaStoreRepository pizzaStoreRepository,
-                                CacheManager cacheManager){
+                                CacheManager cacheManager,AuthController authController){
         this.pizzaStoreService = pizzaStoreService;
         this.pizzaStoreRepository = pizzaStoreRepository;
         this.cacheManager = cacheManager;
+        this.authController = authController;
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -55,9 +57,11 @@ public class PizzaStoreController {
                     HttpStatus.BAD_REQUEST);
         }
         else if(pizzaStoreRepository.existsBySlug(pizza.getSlug())){
+            log.error("Item already exist, slug must be uniq "+pizza.getSlug()+" "+authController.checkUser());
             return new ResponseEntity("Item already exist, slug must be uniq",
                     HttpStatus.BAD_REQUEST);
         }
+        log.info("Item created with slug "+pizza.getSlug()+" "+authController.checkUser());
         cacheManager.getCacheNames()
                 .forEach(cacheName -> Objects.requireNonNull(cacheManager.getCache(cacheName)).clear());
         return ResponseEntity.ok(pizzaStoreService.create(pizza));
@@ -75,9 +79,11 @@ public class PizzaStoreController {
                     HttpStatus.BAD_REQUEST);
         }
         else if(!pizzaStoreRepository.existsBySlug(pizza.getSlug())){
+            log.error("Item does not exist, slug "+pizza.getSlug()+" "+authController.checkUser());
             return new ResponseEntity("Item does not exist, insert item first",
                     HttpStatus.BAD_REQUEST);
         }
+        log.info("Item updated with slug "+pizza.getSlug()+" "+authController.checkUser());
         cacheManager.getCacheNames()
                 .forEach(cacheName -> Objects.requireNonNull(cacheManager.getCache(cacheName)).clear());
         return ResponseEntity.ok(pizzaStoreService.update(pizza));

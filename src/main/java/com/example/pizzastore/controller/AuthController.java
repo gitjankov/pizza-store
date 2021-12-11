@@ -5,6 +5,7 @@ import com.example.pizzastore.model.User;
 import com.example.pizzastore.repsitory.JwtUserRepository;
 import com.example.pizzastore.service.CustomUserDetailsService;
 import com.example.pizzastore.util.JwtUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+@Slf4j
 @RestController
 public class AuthController {
 
@@ -67,10 +69,11 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
         if(userRepository.findUserByEmail(signUpRequest.getEmail()) != null) {
+            log.error("Email Address already in use."+signUpRequest.getEmail() );
             return new ResponseEntity(ApiResponse.builder().success(false).message("Email Address already in use!").build(),
                     HttpStatus.BAD_REQUEST);
         }
-
+        log.info("User registered successfully."+signUpRequest.getEmail());
         User jwtUser = new User();
         jwtUser.setEmail(signUpRequest.getEmail());
         jwtUser.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
